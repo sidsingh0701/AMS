@@ -1,0 +1,18 @@
+module test_div;
+
+reg clock;
+reg [47:0] ip1;
+
+initial
+begin
+	clock = 0;
+	#10
+	ip1 = 48'hd8358ad68572;
+	#10
+	ip1 = 48'hd65714d5e31c;
+end
+
+always #5 clock = ~clock;
+
+ div_compute a1(.clock(clock),.element1(ip1));
+endmodule

@@ -1,0 +1,115 @@
+module top_4(clock,addressY,reset, Vout, SyncY, SyncV, mult_output,adder_out7);
+
+input reset;
+input clock;
+output [10:0] addressY;
+//output [47:0] outA,outB;
+output [47:0] Vout;
+output [47:0] SyncY;
+output [47:0] SyncV;
+output [48:0] mult_output;
+output [23:0] adder_out7;
+
+//output [3:0] count,count3;
+//output [2:0] count2;
+
+reg  [47:0] Element;
+reg [48:0] reg_outB;
+wire [2:0] count;
+wire found1,found2,found3,found4;
+wire [47:0] outA;
+wire [48:0] outB;
+wire [10:0] addressY;
+wire [255:0]data;
+wire [10:0] ElementAddr;
+wire [8:0]  Rowread1;
+wire [8:0]  Rowread2;
+wire [8:0]  Rowread3;
+wire [8:0]  Rowread4;
+wire [47:0] vop1;
+wire [47:0] vop2;
+wire [47:0] vop3;
+wire [47:0] vop4;
+wire [47:0] Vout;
+wire [48:0] SyncY;
+wire [47:0] SyncV;
+wire [48:0] mult_output;
+wire [23:0] adder_input;
+wire [24:0] adder_output;
+wire [23:0] adder_input_imag;
+wire [24:0] adder_output_imag;
+wire [23:0] adder_out1,adder_out2,adder_out3,adder_out4;
+wire [23:0] adder_out5,adder_out6,adder_out7;
+wire [23:0] adder_out1_imag,adder_out2_imag,adder_out3_imag,adder_out4_imag;
+wire [23:0] adder_out5_imag,adder_out6_imag,adder_out7_imag;
+wire [7:0] addressI;
+wire [191:0] outI;
+wire [47:0] dataI;
+reg [47:0] delay1;
+wire [47:0] subOut;
+wire [47:0] div_output;
+wire [47:0] diagonal_output;
+wire [47:0] op1;
+wire [47:0] op_final;
+wire signal;
+wire [8:0] write_addr1,write_addr2,write_addr3,write_addr4;
+wire we1,we2,we3,we4;
+reg [47:0] op_reg;
+wire signal2;
+wire signal_I;
+wire sig;
+wire EOF;
+wire [4:0] MainCount1;
+wire sig_OP;
+wire OP;
+
+ selector a1 (.dataY(data),.count(count),.found1(found1),.found2(found2),.found3(found3),.found4(found4),.EOF(EOF));
+ EOF_reg a31(.clock(clock),.reset(reset),.EOF(EOF),.OP(OP),.sig(sig_OP));
+ y_arbiter a2 (.reset(reset),.clock(clock),.addressY(addressY),.count2(count),.EOF(EOF),.MainCount(MainCount1), .sig(sig_OP));
+ decoder a3 (.clock(clock), .reset(reset), .data(data), .Diagonal(outA), .Element(outB), .ElementAddr(ElementAddr),.EOF(EOF),.sig(sig_OP));
+ y_sram a4 (.clock(clock),.ReadAddress1(addressY),.ReadBus1(data));
+ v_arbiter a5 (.vop1(vop1),.vop2(vop2),.vop3(vop3),.vop4(vop4), .rowno(ElementAddr),.clock(clock),.Vout(Vout),.Rowread1(Rowread1),.Rowread2(Rowread2),.Rowread3(Rowread3),.Rowread4(Rowread4),.count2(MainCount1[0]));
+ v_sram_op1 a6 (.clock(clock), .ReadAddress1(Rowread1), .ReadBus1(vop1),.WE(we1),.WriteAddress1(write_addr1),.WriteBus1(op_reg));
+ v_sram_op2 a7 (.clock(clock), .ReadAddress1(Rowread2), .ReadBus1(vop2),.WE(we2),.WriteAddress1(write_addr2),.WriteBus1(op_reg));
+ v_sram_op3 a8 (.clock(clock), .ReadAddress1(Rowread3), .ReadBus1(vop3),.WE(we3),.WriteAddress1(write_addr3),.WriteBus1(op_reg));
+ v_sram_op4 a9 (.clock(clock), .ReadAddress1(Rowread4), .ReadBus1(vop4),.WE(we4),.WriteAddress1(write_addr4),.WriteBus1(op_reg));
+ sync a10 (.clock(clock), .ElementY(outB), .ElementV(Vout), .SyncY(SyncY), .SyncV(SyncV));
+ div_compute a20(.clock(clock),.element1(outA),.new1(div_output));
+ diagonal_pipeline a21(.clock(clock),.input_diagonal(div_output),.output_diagonal(diagonal_output));
+ multiply a11 (.clock(clock), .element1(SyncY), .element2(SyncV), .new1(mult_output));
+/*always @(posedge clock)
+ begin
+	reg_outB <= mult_output;
+ end*/
+ controller2 a12 (.clock(clock),.reset(reset), .accum_in(adder_output), .feedback(adder_input),.set_bit(mult_output[48]), .element(mult_output[48:24]),.adder_out1(adder_out1),.adder_out2(adder_out2),.adder_out3(adder_out3),.adder_out4(adder_out4));
+ mult_compute a13 (.clock(clock), .element1(mult_output[48:24]), .element2(adder_input),.new1(adder_output));
+ mult_compute_1 a14 (.clock(clock), .element1(adder_out1), .element2(adder_out2),.new1(adder_out5));
+ mult_compute_1 a15 (.clock(clock), .element1(adder_out3), .element2(adder_out4),.new1(adder_out6));
+ mult_compute_1 a16 (.clock(clock), .element1(adder_out5), .element2(adder_out6),.new1(adder_out7));
+
+ controller2 a26 (.clock(clock),.reset(reset), .accum_in(adder_output_imag), .feedback(adder_input_imag),.set_bit(mult_output[48]), .element({mult_output[48],mult_output[23:0]}),.adder_out1(adder_out1_imag),.adder_out2(adder_out2_imag),.adder_out3(adder_out3_imag),.adder_out4(adder_out4_imag));
+ mult_compute a27 (.clock(clock), .element1({mult_output[48],mult_output[23:0]}), .element2(adder_input_imag),.new1(adder_output_imag));
+ mult_compute_1 a28 (.clock(clock), .element1(adder_out1_imag), .element2(adder_out2_imag),.new1(adder_out5_imag));
+ mult_compute_1 a29 (.clock(clock), .element1(adder_out3_imag), .element2(adder_out4_imag),.new1(adder_out6_imag));
+ mult_compute_1 a30 (.clock(clock), .element1(adder_out5_imag), .element2(adder_out6_imag),.new1(adder_out7_imag));
+
+
+always@(posedge clock)
+begin
+	delay1 <= {adder_out7,adder_out7_imag};
+
+end
+ isched a17(.clock(clock),.reset(reset),.addressI(addressI),.data(outI),.dataI(dataI), .FinalOutput(adder_out7), .sig(sig));
+ I_signal u1 (.signal_I(signal_I), .clock(clock), .reset(reset), .sig(sig));
+ i_sram a18(.clock(clock), .ReadAddress1(addressI),.ReadBus1(outI));
+ sub2 a19(.clock(clock), .element1(dataI), .element2(delay1),.new1(subOut));
+ check a22(.input1(subOut),.input2(diagonal_output),.output_final(op1));
+ multiply2 a23(.clock(clock), .element1(op1), .element2(subOut),.new1(op_final));
+ always@(posedge clock)
+ begin
+	op_reg <= op_final;
+ end
+ write_enable a24(.input_data(op_final),.input_data2(op_reg),.signal(signal),.signal2(signal2));
+ v_sched a25(.signal(signal),.signal2(signal2),.clock(clock),.reset(reset),.write_addr1(write_addr1),.we1(we1),.write_addr2(write_addr2),.we2(we2),.write_addr3(write_addr3),.we3(we3),.write_addr4(write_addr4),.we4(we4),.sig_I(sig_OP),.count2(MainCount1[0]));
+
+endmodule

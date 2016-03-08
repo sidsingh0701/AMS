@@ -1,0 +1,68 @@
+Information: Updating design information... (UID-85)
+Warning: Design 'top_4' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : top_4
+Version: I-2013.12-SP1
+Date   : Thu Apr 16 12:54:24 2015
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: slow   Library: NangateOpenCellLibrary_PDKv1_2_v2008_10_slow_nldm
+Wire Load Model Mode: top
+
+  Startpoint: ReadBus1[51]
+              (input port clocked by clock)
+  Endpoint: u7/Element_reg[47]
+            (rising edge-triggered flip-flop clocked by clock)
+  Path Group: clock
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock clock (rise edge)                               0.0000     0.0000
+  clock network delay (ideal)                           0.0000     0.0000
+  input external delay                                  0.6580     0.6580 f
+  ReadBus1[51] (in)                                     0.0618     0.7198 f
+  U453/ZN (INV_X4)                                      0.0760     0.7958 r
+  U452/ZN (INV_X4)                                      0.0294     0.8252 f
+  u15/Row1[51] (MainArbiter_1)                          0.0000     0.8252 f
+  u15/U257/Z (BUF_X4)                                   0.1688     0.9940 f
+  u15/Output_2Row1[51] (MainArbiter_1)                  0.0000     0.9940 f
+  u7/NewRowX[51] (update_3_1)                           0.0000     0.9940 f
+  u7/U645/Z (XOR2_X2)                                   0.2901     1.2841 f
+  u7/U644/ZN (NOR4_X2)                                  0.4378     1.7218 r
+  u7/U643/ZN (AND4_X2)                                  0.4241     2.1459 r
+  u7/U600/ZN (NOR2_X2)                                  0.1243     2.2702 f
+  u7/U24/ZN (AND2_X4)                                   0.3478     2.6179 f
+  u7/U234/ZN (AOI222_X1)                                0.9883     3.6062 r
+  u7/U27/ZN (OAI221_X2)                                 0.2864     3.8926 f
+  u7/U25/ZN (AOI221_X2)                                 0.3623     4.2549 r
+  u7/U1015/ZN (AND2_X1)                                 0.3131     4.5680 r
+  u7/U23/ZN (OAI221_X2)                                 0.1213     4.6893 f
+  u7/U185/ZN (AOI222_X1)                                0.6163     5.3056 r
+  u7/U830/ZN (OAI222_X2)                                0.2350     5.5406 f
+  u7/U829/ZN (AOI222_X1)                                1.0037     6.5443 r
+  u7/U827/ZN (OAI211_X2)                                0.2457     6.7900 f
+  u7/Element_reg[47]/D (DFF_X1)                         0.0000     6.7900 f
+  data arrival time                                                6.7900
+
+  clock clock (rise edge)                              10.0000    10.0000
+  clock network delay (ideal)                           0.0000    10.0000
+  clock uncertainty                                    -0.0500     9.9500
+  u7/Element_reg[47]/CK (DFF_X1)                        0.0000     9.9500 r
+  library setup time                                   -0.3607     9.5893
+  data required time                                               9.5893
+  --------------------------------------------------------------------------
+  data required time                                               9.5893
+  data arrival time                                               -6.7900
+  --------------------------------------------------------------------------
+  slack (MET)                                                      2.7993
+
+
+1

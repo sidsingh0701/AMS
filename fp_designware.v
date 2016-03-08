@@ -1,0 +1,122 @@
+module fp_designware(clock, SyncMultY, SyncV, multinput, op1, Mul_In, op_final, dataI, delay1, subOut, SubInput1, SubInput2, SubOutput, AddInput1, AddInput2, AddOutput, adder_out1, adder_out2, adder_out3, adder_out4, adder_out7,  adder_out1_imag, adder_out2_imag, adder_out3_imag, adder_out4_imag, adder_out7_imag, accum_input, adder_input, accum_input, accum_input_imag, adder_input_imag, accum_input_imag, diagonalC, diagonalD, diagOut, div_output, accum_output_imag, accum_output);
+
+
+
+//----------- Mult Connection ------------//
+input         clock;
+
+output  [47:0] multinput;
+output  [47:0] op_final;
+input [47:0] SyncMultY;
+input [47:0] SyncV;
+input [47:0] op1;
+output [47:0] subOut;
+input [47:0] Mul_In;
+wire [47:0] op_final;
+//-----------------------------------------//
+
+//----------- Sub Connection ------------//
+input [47:0] dataI;
+input [47:0] delay1; 
+input [23:0] SubInput1;
+input [23:0] SubInput2;
+output [23:0] SubOutput;
+wire  [23:0] SubOutput;
+//-----------------------------------------//
+
+//----------- Accumulator Connection ------------//
+input [23:0] adder_out1;
+input [23:0] adder_out2;
+input [23:0] adder_out3;
+input [23:0] adder_out4;
+
+output [23:0] adder_out7;
+input [23:0] adder_out1_imag;
+input [23:0] adder_out2_imag;
+input [23:0] adder_out3_imag;
+input [23:0] adder_out4_imag;
+
+output [23:0] adder_out7_imag;
+output [23:0] accum_output;
+input [23:0] accum_input;
+input [23:0] adder_input;
+output [23:0] accum_output_imag;
+input [23:0] accum_input_imag;
+input [23:0] adder_input_imag;
+
+input [23:0] AddInput1;
+input [23:0] AddInput2;
+output [23:0] AddOutput;
+
+wire [23:0] AddOutput;
+
+//-----------------------------------------//
+
+//----------- Div Connection ------------//
+output [47:0] div_output;
+input [23:0] diagonalC;
+input [23:0] diagonalD;
+//wire [47:0] outA; 
+input [47:0] diagOut;
+
+//-----------------------------------------//
+
+//----------- Mult Connection ------------//
+wire  [47:0] multinput;
+//output  [47:0] op_final;
+input [47:0] SyncMultY;
+input [47:0] SyncV;
+input [47:0] op1;
+wire [47:0] subOut;
+//input [47:0] Mul_In;
+//-----------------------------------------//
+
+//----------- Sub Connection ------------//
+input [47:0] dataI;
+//input [47:0] delay1; 
+//-----------------------------------------//
+
+//----------- Accumulator Connection ------------//
+wire [23:0] adder_out5;
+wire [23:0] adder_out6;
+wire [23:0] adder_out7;
+//wire [23:0] adder_out1_imag;
+wire [23:0] adder_out5_imag;
+wire [23:0] adder_out6_imag;
+wire [23:0] adder_out7_imag;
+wire [23:0] accum_output;
+wire [23:0] accum_output_imag;
+//-----------------------------------------//
+
+//----------- Div Connection ------------//
+wire [47:0] div_output;
+//-----------------------------------------//
+
+//----------------------------------------------------DesignVision (Mult)------------------------------------------------------//
+ multiply2 a11(.clock(clock), .element1(SyncMultY), .element2(SyncV), .new1(multinput));
+ multiply2 a23(.clock(clock), .element1(op1), .element2(Mul_In),.new1(op_final));
+//----------------------------------------------------------------------------------------------------------------------------//
+
+//----------------------------------------------------DesignVision (Sub)------------------------------------------------------//
+ sub2 a19(.clock(clock), .element1(dataI), .element2(delay1),.new1(subOut));
+ arith u9 (.clock(clock), .inst_a(SubInput1), .inst_b(SubInput2), .inst_rnd(3'b000), .inst_op(1'b1), .z_inst(SubOutput)); // Subtraction to get the difference
+
+ arith u10 (.clock(clock), .inst_a(AddInput1), .inst_b(AddInput2), .inst_rnd(3'b000), .inst_op(1'b0), .z_inst(AddOutput));
+//----------------------------------------------------------------------------------------------------------------------------//
+
+//---------------------------------------------------------- Accumulator---------------------------------------------------------//
+ mult_compute_1 a14 (.clock(clock), .element1(adder_out1), .element2(adder_out2),.new1(adder_out5));
+ mult_compute_1 a15 (.clock(clock), .element1(adder_out3), .element2(adder_out4),.new1(adder_out6));
+ mult_compute_1 a16 (.clock(clock), .element1(adder_out5), .element2(adder_out6),.new1(adder_out7));
+ mult_compute_1 a28 (.clock(clock), .element1(adder_out1_imag), .element2(adder_out2_imag),.new1(adder_out5_imag));
+ mult_compute_1 a29 (.clock(clock), .element1(adder_out3_imag), .element2(adder_out4_imag),.new1(adder_out6_imag));
+ mult_compute_1 a30 (.clock(clock), .element1(adder_out5_imag), .element2(adder_out6_imag),.new1(adder_out7_imag));
+ mult_compute_1 a32 (.clock(clock), .element1(accum_input), .element2(adder_input), .new1(accum_output));
+ mult_compute_1 a13 (.clock(clock), .element1(accum_input_imag), .element2(adder_input_imag), .new1(accum_output_imag));
+//------------------------------------------------------------------------------------------------------------------------------//
+
+//----------------------------------------------------DesignVision (Div)------------------------------------------------------//
+ div_compute a20 (.clock(clock), .input_buf1(diagonalC), .input_buf2(diagonalD), .element1(diagOut), .new1(div_output));
+//----------------------------------------------------------------------------------------------------------------------------//
+
+endmodule

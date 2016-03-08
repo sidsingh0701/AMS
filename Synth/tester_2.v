@@ -1,0 +1,104 @@
+module controller2(clock,reset,accum_in,feedback,set_bit,count,count2,element,adder_out1,adder_out2,adder_out3,adder_out4);
+
+//input [3:0] NZE;
+input [24:0] element;
+input reset;
+input clock;
+input [24:0] accum_in;
+input set_bit;
+
+output [23:0] adder_out1,adder_out2,adder_out3,adder_out4;
+output [23:0] feedback;
+//output [3:0] count3;
+output [4:0] count;
+output [2:0] count2;
+
+reg [4:0] count;
+reg [2:0] count2;
+//reg [3:0] count3;
+reg [24:0] reg1,reg2,reg3,reg4;
+reg [23:0] feedback;
+reg [23:0] adder_out1,adder_out2,adder_out3,adder_out4;
+
+always@(posedge clock)
+begin
+	if(reset)
+		count <= 5'b0;
+	else if (element == 25'h0)
+		count <= 5'b0000;
+	else if(set_bit)	
+		count <= 5'b0000;
+	else if(!set_bit)
+		count <= count + 1'b1;
+end
+
+always@(*)
+begin
+	feedback = 25'b0;
+	if(set_bit)
+	begin	
+		feedback = 24'b0;
+	end
+	else if((count > 3'b010) && (!set_bit))
+	begin
+		feedback = accum_in[23:0];
+	end
+	else
+		feedback = 25'b0;
+end
+
+/*
+always@(posedge clock)
+begin
+	if(reset)
+	begin
+		count2 <= 3'b000;
+	end
+	else if(set_bit)
+	begin	
+		count2 <= 3'b000;
+	end
+	else if((count == 3'b101) && (!set_bit))
+	begin
+		count2 <= 3'b001;
+	end
+	else if((count2 == 3'b001) && (!set_bit))
+	begin
+		count2 <= 3'b001;
+	end	
+end*/
+
+always@(posedge clock)
+begin
+	if(reset)
+	begin
+		reg1 <= 25'b0;
+		reg2 <= 25'b0;
+		reg3 <= 25'b0;
+		reg4 <= 25'b0;
+		//count3 <= 4'b000;`
+		//count3 <= count3 + 1'b1;
+	end
+end
+
+always@(*)
+begin
+	if(accum_in[24] || (accum_in == 25'b0))
+	begin
+		adder_out1 = reg1[23:0];
+		adder_out2 = reg2[23:0];
+		adder_out3 = reg3[23:0];
+		adder_out4= reg4[23:0]; 
+	end
+	else
+	begin
+		adder_out1 = 24'b0;
+		adder_out2 = 24'b0;
+		adder_out3 = 24'b0;
+		adder_out4 = 24'b0;
+	end				
+end
+
+endmodule
+
+

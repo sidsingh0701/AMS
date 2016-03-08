@@ -1,0 +1,105 @@
+module div_compute (clock,input_buf1,input_buf2, element1,new1);
+
+input         clock;
+input [47:0]  element1;
+
+input [23:0] input_buf1,input_buf2;
+
+
+output [47:0] new1;
+//output [47:0] new2;
+
+reg [23:0] s1,r1,s2,r2,s3,r3,s4,r4;
+
+reg [23:0] buf2,buf3,buf4,buf5,buf7,buf8,buf9,buf10,buf12,buf13;
+reg [23:0] buf14,buf15,buf16,buf17,buf19,buf20,buf21,buf22,buf23,buf24;
+reg [23:0] buf25,buf26,buf27,buf29,buf30,buf31,buf32,buf33,buf34,buf35,buf36,buf37,buf38,buf39,buf40,buf41,buf42,buf43,buf44;
+
+
+wire [23:0] buf1;
+wire [23:0] buf6;
+wire [23:0] buf11;
+wire [23:0] buf18;
+wire [23:0] buf28;
+
+always @(posedge clock)
+begin
+	s1 <= element1[47:24];
+	
+	buf2 <= buf1;
+	buf3 <= buf2;
+	buf4 <= buf3;
+	buf5 <= buf4;
+end	
+DW_fp_mult_48  u8(.a(s1), .b(s1), .rnd(3'b000), .z(buf1)); //c^2 
+always @(posedge clock)
+begin
+	r1 <= element1[23:0];	
+
+	buf7 <= buf6;
+	buf8 <= buf7;
+	buf9 <= buf8;
+	buf10 <= buf9;
+end	
+DW_fp_mult_48  u9(.a(r1), .b(r1), .rnd(3'b000), .z(buf6)); //d^2 
+always @(posedge clock)
+begin
+	s2 <= buf5;
+	r2 <= buf10;	
+
+	buf12 <= buf11;
+	buf13 <= buf12;
+	buf14 <= buf13;
+end	
+addsub u10(.clock(clock), .inst_a(s2), .inst_b(r2), .inst_rnd(3'b000), .inst_op(1'b0), .z_inst(buf11)); // c^2 + d^2
+always @(posedge clock)
+begin
+	s3 <= buf14;
+	
+	/*r3 <= s1;
+	buf15 <= r3;
+	buf16 <= buf15;
+	buf17 <= buf16;	
+	buf35 <= buf17;
+	buf36 <= buf35;
+	buf37 <= buf36;
+	buf38 <= buf37;
+	buf39 <= buf38;*/
+
+	buf19 <= buf18;
+	buf20 <= buf19;
+	buf21 <= buf20;	
+	buf22 <= buf21;
+	buf23 <= buf22;
+	buf24 <= buf23;
+end	
+DW_fp_div_48 u11(.a(input_buf1), .b(s3), .rnd(3'b000), .z(buf18)); // c/c^2+d^2
+always @(posedge clock)
+begin
+	r4 <= buf14;
+	
+	/*s4 <= r1;
+	buf25 <= s4;
+	buf26 <= buf25;
+	buf27 <= buf26;
+	buf40 <= buf27;
+	buf41 <= buf40;
+	buf42 <= buf41;
+	buf43 <= buf42;
+	buf44 <= buf43;	*/
+
+	buf29 <= buf28;
+	buf30 <= buf29;
+	buf31 <= buf30;
+	buf32 <= buf31;
+	buf33 <= buf32;
+	buf34 <= buf33;
+end	
+DW_fp_div_48 u12(.a(input_buf2), .b(r4), .rnd(3'b000), .z(buf28));
+
+assign new1[47:24] = buf24;
+assign new1[23] = ~buf34[23];
+assign new1[22:0] = buf34[22:0];
+
+endmodule
+

@@ -1,0 +1,59 @@
+module v_sched(signal,clock,reset,data,write_addr1,we1,write_addr2,we2,write_addr3,we3,write_addr4,we4);
+
+input signal;
+input clock;
+input reset;
+input [23:0] data;
+
+output [8:0] write_addr1,write_addr2,write_addr3,write_addr4;
+output we1,we2,we3,we4;
+
+reg [8:0] write_addr1,write_addr2,write_addr3,write_addr4;
+reg we1,we2,we3,we4;
+
+reg [1:0] count;
+reg [8:0] addressV;
+
+always@(posedge clock)
+begin
+	if(reset)
+	begin
+		count <= 2'b00;
+		addressV <= 9'h100;
+	end
+	else if(count != 2'b11 && signal)
+		count <= count + 1'b1;
+	else
+	begin
+		count <= 2'b00;
+		addressV <= addressV + 1'b1;
+	end
+end
+
+always@(*)
+begin
+	write_addr1 = 9'hx;write_addr2 = 9'hx; write_addr3 = 9'hx;write_addr4 = 9'hx;
+	we1 = 1'hx;we2 = 1'hx;we3 = 1'hx;we4 = 1'hx;
+	if(count == 2'b00 && signal)
+	begin
+		write_addr1 = addressV;
+		we1 = 1'b1;
+	end
+	else if(count == 2'b01 && signal)
+	begin
+		write_addr2 = addressV;
+		we2 = 1'b1;
+	end
+	else if(count == 2'b01 && signal)
+	begin
+		write_addr3 = addressV;
+		we3 = 1'b1;
+	end
+	else if(count == 2'b01 && signal)
+	begin
+		write_addr4 = addressV;
+		we4 = 1'b1;
+	end
+end
+
+endmodule
